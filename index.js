@@ -12,12 +12,12 @@ let quadtree;
 
 const createAnnotationData = (datapoint) => ({
   note: {
-    label: datapoint.first_author_name + " " + datapoint.year,
+    label: datapoint["location-lat"] + " " + datapoint["location-long"],
     bgPadding: 5,
-    title: trunc(datapoint.title, 100),
+    title: trunc(datapoint["individual-local-identifier"], 100),
   },
-  x: datapoint.x,
-  y: datapoint.y,
+  x: datapoint["utm-easting"],
+  y: datapoint["utm-northing"],
   dx: 20,
   dy: 20,
 });
@@ -54,7 +54,7 @@ streamingLoaderWorker.onmessage = ({
       el.addEventListener("click", () => {
         iterateElements(".controls a", (el2) => el2.classList.remove("active"));
         el.classList.add("active");
-        fillColor.value(nameFill);
+        fillColor.value(el.id === "language" ? languageFill : yearFill);
         redraw();
       });
     });
@@ -70,8 +70,24 @@ streamingLoaderWorker.onmessage = ({
   redraw();
 };
 streamingLoaderWorker.postMessage("data2.tsv");
+const colorList = [
+  "Red",
+  "Orange",
+  "Yellow",
+  "Green",
+  "Blue",
+  "Purple",
+  "Pink",
+  "Brown",
+  "Black",
+  "Gray",
+  "White",
+  "Gold",
+  "Silver",
+  "Bronze",
+];
 
-const languageColorScale = d3.scaleOrdinal(d3.schemeCategory10);
+const languageColorScale = d3.scaleOrdinal(colorList);
 
 //these need to be domain of the data
 const xScale = d3.scaleLinear().domain([624079.8465020715, 629752.8465020715]);
@@ -109,13 +125,10 @@ const pointer = fc.pointer().on("point", ([coord]) => {
   }
 
   // find the closes datapoint to the pointer
-  const x = xScale.invert(coord["utm-easting"]);
-  const y = yScale.invert(coord["utm-northing"]);
-  const radius = Math.abs(
-    xScale.invert(coord["utm-easting"]) -
-      xScale.invert(coord["utm-easting"] - 20)
-  );
-  const closestDatum = quadtree.find(x, y, radius);
+  const x = xScale.invert(coord.x);
+  const y = yScale.invert(coord.y);
+  // const radius = Math.abs(xScale.invert(coord.x) - xScale.invert(coord.y - 20));
+  const closestDatum = quadtree.find(x, y, 10);
 
   // if the closest point is within 20 pixels, show the annotation
 
@@ -151,8 +164,8 @@ const chart = fc
       .enter()
       .select("d3fc-svg.plot-area")
       .on("measure.range", () => {
-        xScaleOriginal.range([0, d3.event.detail.width]);
-        yScaleOriginal.range([d3.event.detail.height, 0]);
+        xScaleOriginal.range([0, 1000]);
+        yScaleOriginal.range([1000, 0]);
       })
       .call(zoom)
       .call(pointer)
