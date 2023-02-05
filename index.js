@@ -4,56 +4,57 @@ import {
   trunc,
   hashCode,
   webglColor,
-  iterateElements
+  iterateElements,
 } from "./util.js";
 
 let data = [];
 let quadtree;
 
-const createAnnotationData = datapoint => ({
+const createAnnotationData = (datapoint) => ({
   note: {
     label: datapoint.first_author_name + " " + datapoint.year,
     bgPadding: 5,
-    title: trunc(datapoint.title, 100)
+    title: trunc(datapoint.title, 100),
   },
   x: datapoint.x,
   y: datapoint.y,
   dx: 20,
-  dy: 20
+  dy: 20,
 });
+
+console.log("I was here");
 
 // create a web worker that streams the chart data
 const streamingLoaderWorker = new Worker("streaming-tsv-parser.js");
 streamingLoaderWorker.onmessage = ({
-  data: { items, totalBytes, finished }
+  data: { items, totalBytes, finished },
 }) => {
   const rows = items
-    .map(d => ({
+    .map((d) => ({
       ...d,
-      x: Number(d.x),
-      y: Number(d.y),
-      year: Number(d.date)
+      x: Number(d["utm-easting"]),
+      y: Number(d["utm-northing"]),
+      name: d["individual-local-identifier"],
     }))
-    .filter(d => d.year);
+    .filter((d) => d.name);
   data = data.concat(rows);
 
   if (finished) {
     document.getElementById("loading").style.display = "none";
 
     // compute the fill color for each datapoint
-    const languageFill = d =>
-      webglColor(languageColorScale(hashCode(d.language) % 10));
-    const yearFill = d => webglColor(yearColorScale(d.year));
+    const nameFill = (d) =>
+      webglColor(languageColorScale(hashCode(d.name) % 10));
 
-    const fillColor = fc.webglFillColor().value(languageFill).data(data);
-    pointSeries.decorate(program => fillColor(program));
+    const fillColor = fc.webglFillColor().value(nameFill).data(data);
+    pointSeries.decorate((program) => fillColor(program));
 
     // wire up the fill color selector
-    iterateElements(".controls a", el => {
+    iterateElements(".controls a", (el) => {
       el.addEventListener("click", () => {
-        iterateElements(".controls a", el2 => el2.classList.remove("active"));
+        iterateElements(".controls a", (el2) => el2.classList.remove("active"));
         el.classList.add("active");
-        fillColor.value(el.id === "language" ? languageFill : yearFill);
+        fillColor.value(nameFill);
         redraw();
       });
     });
@@ -61,22 +62,23 @@ streamingLoaderWorker.onmessage = ({
     // create a spatial index for rapidly finding the closest datapoint
     quadtree = d3
       .quadtree()
-      .x(d => d.x)
-      .y(d => d.y)
+      .x((d) => d["utm-easting"])
+      .y((d) => d["utm-northing"])
       .addAll(data);
   }
 
   redraw();
 };
-streamingLoaderWorker.postMessage("data.tsv");
+streamingLoaderWorker.postMessage("data2.tsv");
 
 const languageColorScale = d3.scaleOrdinal(d3.schemeCategory10);
-const yearColorScale = d3
-  .scaleSequential()
-  .domain([1850, 2000])
-  .interpolator(d3.interpolateRdYlGn);
-const xScale = d3.scaleLinear().domain([-50, 50]);
-const yScale = d3.scaleLinear().domain([-50, 50]);
+
+//these need to be domain of the data
+const xScale = d3.scaleLinear().domain([624079.8465020715, 629752.8465020715]);
+
+const yScale = d3
+  .scaleLinear()
+  .domain([1009715.5668793379, 1015157.5668793379]);
 const xScaleOriginal = xScale.copy();
 const yScaleOriginal = yScale.copy();
 
@@ -84,8 +86,8 @@ const pointSeries = fc
   .seriesWebglPoint()
   .equals((a, b) => a === b)
   .size(1)
-  .crossValue(d => d.x)
-  .mainValue(d => d.y);
+  .crossValue((d) => d["utm-easting"])
+  .mainValue((d) => d["utm-northing"]);
 
 const zoom = d3
   .zoom()
@@ -107,12 +109,16 @@ const pointer = fc.pointer().on("point", ([coord]) => {
   }
 
   // find the closes datapoint to the pointer
-  const x = xScale.invert(coord.x);
-  const y = yScale.invert(coord.y);
-  const radius = Math.abs(xScale.invert(coord.x) - xScale.invert(coord.x - 20));
+  const x = xScale.invert(coord["utm-easting"]);
+  const y = yScale.invert(coord["utm-northing"]);
+  const radius = Math.abs(
+    xScale.invert(coord["utm-easting"]) -
+      xScale.invert(coord["utm-easting"] - 20)
+  );
   const closestDatum = quadtree.find(x, y, radius);
 
   // if the closest point is within 20 pixels, show the annotation
+
   if (closestDatum) {
     annotations[0] = createAnnotationData(closestDatum);
   }
@@ -131,16 +137,16 @@ const chart = fc
     fc
       .seriesWebglMulti()
       .series([pointSeries])
-      .mapping(d => d.data)
+      .mapping((d) => d.data)
   )
   .svgPlotArea(
     // only render the annotations series on the SVG layer
     fc
       .seriesSvgMulti()
       .series([annotationSeries])
-      .mapping(d => d.annotations)
+      .mapping((d) => d.annotations)
   )
-  .decorate(sel =>
+  .decorate((sel) =>
     sel
       .enter()
       .select("d3fc-svg.plot-area")
