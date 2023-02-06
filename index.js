@@ -43,10 +43,10 @@ streamingLoaderWorker.onmessage = ({
     document.getElementById("loading").style.display = "none";
 
     // compute the fill color for each datapoint
-    const nameFill = (d) =>
-      webglColor(languageColorScale(hashCode(d.name) % 10));
+    const nameFill = (d) => webglColor(nameColorScale(hashCode(d.name) % 10));
 
     const fillColor = fc.webglFillColor().value(nameFill).data(data);
+
     pointSeries.decorate((program) => fillColor(program));
 
     // wire up the fill color selector
@@ -54,7 +54,8 @@ streamingLoaderWorker.onmessage = ({
       el.addEventListener("click", () => {
         iterateElements(".controls a", (el2) => el2.classList.remove("active"));
         el.classList.add("active");
-        fillColor.value(el.id === "language" ? languageFill : yearFill);
+        console.log(el.id + " is the ID");
+        fillColor.value(el.id === "language" ? nameFill : yearFill);
         redraw();
       });
     });
@@ -70,24 +71,8 @@ streamingLoaderWorker.onmessage = ({
   redraw();
 };
 streamingLoaderWorker.postMessage("data2.tsv");
-const colorList = [
-  "Red",
-  "Orange",
-  "Yellow",
-  "Green",
-  "Blue",
-  "Purple",
-  "Pink",
-  "Brown",
-  "Black",
-  "Gray",
-  "White",
-  "Gold",
-  "Silver",
-  "Bronze",
-];
 
-const languageColorScale = d3.scaleOrdinal(colorList);
+const nameColorScale = d3.scaleOrdinal(d3.schemeCategory10);
 
 //these need to be domain of the data
 const xScale = d3.scaleLinear().domain([624079.8465020715, 629752.8465020715]);
