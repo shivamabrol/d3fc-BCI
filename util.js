@@ -15,6 +15,9 @@ export const hashCode = (s) =>
 
 export const webglColor = (color) => {
   const { r, g, b, opacity } = d3.color(color).rgb();
+  if (color == "white") {
+    return [r / 255, g / 255, b / 255, 0];
+  }
   return [r / 255, g / 255, b / 255, opacity];
 };
 

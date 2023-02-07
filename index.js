@@ -177,20 +177,20 @@ const names = [
 
 const nameColorScale = d3.scaleOrdinal(colors);
 
-const DanielColorScale = d3.scaleOrdinal(["#1abc9c", "cyan"]);
-const MagnoliaColorScale = d3.scaleOrdinal(["cyan", "#16a085"]);
-const JessyColorScale = d3.scaleOrdinal(["cyan", "#2ecc71"]);
-const DrogonColorScale = d3.scaleOrdinal(["cyan", "#27ae60"]);
-const ViserionColorScale = d3.scaleOrdinal(["cyan", "#3498db"]);
-const RhaegalColorScale = d3.scaleOrdinal(["cyan", "#2980b9"]);
-const JohnSnowColorScale = d3.scaleOrdinal(["cyan", "#9b59b6"]);
-const Rhaegal_2ColorScale = d3.scaleOrdinal(["cyan", "#8e44ad"]);
-const Viserion_2ColorScale = d3.scaleOrdinal(["cyan", "#f1c40f"]);
-const SamwellTarlyColorScale = d3.scaleOrdinal(["cyan", "#f39c12"]);
-const GendryColorScale = d3.scaleOrdinal(["cyan", "#e67e22"]);
-const Gendry_2ColorScale = d3.scaleOrdinal(["cyan", "#d35400"]);
-const DaenerysColorScale = d3.scaleOrdinal(["cyan", "#e74c3c"]);
-const OlennaTyrellColorScale = d3.scaleOrdinal(["cyan", "#c0392b"]);
+const DanielColorScale = d3.scaleOrdinal(["#1abc9c", "white"]);
+const MagnoliaColorScale = d3.scaleOrdinal(["white", "#16a085"]);
+const JessyColorScale = d3.scaleOrdinal(["white", "#2ecc71"]);
+const DrogonColorScale = d3.scaleOrdinal(["white", "#27ae60"]);
+const ViserionColorScale = d3.scaleOrdinal(["white", "#3498db"]);
+const RhaegalColorScale = d3.scaleOrdinal(["white", "#2980b9"]);
+const JohnSnowColorScale = d3.scaleOrdinal(["white", "#9b59b6"]);
+const Rhaegal_2ColorScale = d3.scaleOrdinal(["white", "#8e44ad"]);
+const Viserion_2ColorScale = d3.scaleOrdinal(["white", "#f1c40f"]);
+const SamwellTarlyColorScale = d3.scaleOrdinal(["white", "#f39c12"]);
+const GendryColorScale = d3.scaleOrdinal(["white", "#e67e22"]);
+const Gendry_2ColorScale = d3.scaleOrdinal(["white", "#d35400"]);
+const DaenerysColorScale = d3.scaleOrdinal(["white", "#e74c3c"]);
+const OlennaTyrellColorScale = d3.scaleOrdinal(["white", "#c0392b"]);
 
 //these need to be domain of the data
 const xScale = d3.scaleLinear().domain([624079.8465020715, 629752.8465020715]);
