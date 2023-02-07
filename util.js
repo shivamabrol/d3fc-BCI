@@ -7,13 +7,13 @@ export const distance = (x1, y1, x2, y2) => {
 export const trunc = (str, len) =>
   str.length > len ? str.substr(0, len - 1) + "..." : str;
 
-export const hashCode = s =>
+export const hashCode = (s) =>
   s.split("").reduce((a, b) => {
     a = (a << 5) - a + b.charCodeAt(0);
     return a & a;
   }, 0);
 
-export const webglColor = color => {
+export const webglColor = (color) => {
   const { r, g, b, opacity } = d3.color(color).rgb();
   return [r / 255, g / 255, b / 255, opacity];
 };
